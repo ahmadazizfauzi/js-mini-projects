@@ -10,7 +10,7 @@ async function getWeatherForecast() {
     const response = await axios.get(URL);
     const list = response.data.list;
 
-    // Filter: ambil 1 data per hari (yang jam 12:00:00)
+    // Filter: get 1 entry per day (at 12:00:00 UTC)
     const dailyForecasts = [];
     const seenDates = new Set();
 
@@ -19,7 +19,7 @@ async function getWeatherForecast() {
       const dateStr = date.toISOString().split("T")[0]; // "YYYY-MM-DD"
       const hour = date.getUTCHours();
 
-      // Ambil data jam 12:00 UTC, skip jika hari sudah ada
+      // Pick entry at 12:00 UTC, skip if date already recorded
       if (hour === 12 && !seenDates.has(dateStr)) {
         seenDates.add(dateStr);
         dailyForecasts.push({
@@ -31,7 +31,7 @@ async function getWeatherForecast() {
       if (dailyForecasts.length === 5) break;
     }
 
-    // Jika jam 12:00 tidak cukup 5 hari, fallback: ambil data pertama per hari
+    // Fallback: if 12:00 UTC not available for 5 days, take first entry per day
     if (dailyForecasts.length < 5) {
       seenDates.clear();
       dailyForecasts.length = 0;
